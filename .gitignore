@@ -1,0 +1,9 @@
+scraperenv/
+PDF/
+
+debug.log
+*.pdf
+*.pkl
+
+__pycache__
+.idea/
