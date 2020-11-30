@@ -21,7 +21,7 @@ from docx.shared import Inches
 course_id = "ao62et"
 
 # This is the default delay. Increase this if you are not getting images in your PDF.
-delay = 0.1
+delay = 0.3
 
 # Selenium Path. Download Selenium from Chrome for your OS
 selenium_path = r"C:\Programming\Python\Selenium\chromedriver.exe"
@@ -51,10 +51,21 @@ def startup():
                f"https%3A%2F%2Fachieve.macmillanlearning.com%2Fcourses%3Fredirect%3D%252Fcourses%252F{course_id}")
 
 
-def process_html(text, number, doc):
+def process_html(text, number, groups, doc):
     ans, s = [x.group(1) for x in re.finditer('aria-label="(.*?)"', text)], ""
-    for i, a in enumerate(ans):
-        s += unescape(f"Q{number}. {a}\n" if i == 0 else f"  {chr(64 + i)}. {a}\n")
+    for i in range(len(ans)):
+        if groups:
+            s += unescape(
+                f"Q{number}. {groups}\n" if i == 0 else f"  {chr(64 + i)}. {ans[i - 1]}\n"
+            )
+            if i == len(ans) - 1:
+                s += unescape(
+                    f"  {chr(65 + i)}. {ans[i]}\n"
+                )
+        else:
+            s += unescape(
+                f"Q{number}. {ans[i]}\n" if i == 0 else f"  {chr(64 + i)}. {ans[i]}\n"
+            )
     doc.add_paragraph(unescape(s))
 
 
@@ -85,8 +96,16 @@ def main(doc_name, num_q):
                 WebDriverWait(driver, 0.5).until(
                     EC.element_to_be_clickable(
                         (By.XPATH, f'/html/body/div/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
+
             img = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.CLASS_NAME, "module-container"))).screenshot_as_png
+                EC.element_to_be_clickable((By.CLASS_NAME, "module-container")))
+            # Wait for table or figures
+            m = re.search(r'(\(Figure.*?|\(Table.*?)', driver.page_source, flags=re.IGNORECASE)
+            if bool(m):
+                time.sleep(delay * 10)
+                print("Waiting for Table / Figure")
+            table_fig = m.groups()[0][1:] if m else None
+            img = img.screenshot_as_png
             imageStream = io.BytesIO(img)
             im = Image.open(imageStream)
             im = im.resize([int(0.5 * s) for s in im.size])
@@ -94,11 +113,11 @@ def main(doc_name, num_q):
             try:
                 process_html(WebDriverWait(driver, 1).until(
                     EC.element_to_be_clickable((By.CLASS_NAME, "module-graded-correct "))).get_attribute(
-                    'innerHTML'), i, document)
+                    'innerHTML'), i, table_fig, document)
             except:
                 process_html(WebDriverWait(driver, 1).until(
                     EC.element_to_be_clickable((By.CLASS_NAME, "module-graded-missed "))).get_attribute(
-                    'innerHTML'), i, document)
+                    'innerHTML'), i, table_fig, document)
             document.add_picture(f"pages/page-{i}.png")
 
             if error_log:
