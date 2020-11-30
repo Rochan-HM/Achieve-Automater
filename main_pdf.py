@@ -177,5 +177,5 @@ if __name__ == '__main__':
         except:
             driver.switch_to.default_content()
             os.remove(f"{doc_name}.pdf")
-            print("Sorry an error has occurred...")
+            print("Sorry an error has occurred Please try using the other file...")
             pass

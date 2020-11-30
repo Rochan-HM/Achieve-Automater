@@ -1,5 +1,6 @@
 scraperenv/
 PDF/
+DOCX/
 
 debug.log
 *.pdf
