@@ -21,7 +21,7 @@ from docx.shared import Inches
 course_id = "ao62et"
 
 # This is the default delay. Increase this if you are not getting images in your PDF.
-delay = 0.3
+delay = 0.2
 
 # Selenium Path. Download Selenium from Chrome for your OS
 selenium_path = r"C:\Programming\Python\Selenium\chromedriver.exe"
@@ -91,16 +91,22 @@ def main(doc_name, num_q):
             try:
                 WebDriverWait(driver, 0.5).until(
                     EC.element_to_be_clickable(
-                        (By.XPATH, f'/html/body/div[2]/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
+                        (By.XPATH, f"/html/body/div/main/section/div[1]/div/button[2]"))).click()
+
             except:
-                WebDriverWait(driver, 0.5).until(
-                    EC.element_to_be_clickable(
-                        (By.XPATH, f'/html/body/div/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
+                try:
+                    WebDriverWait(driver, 0.5).until(
+                        EC.element_to_be_clickable(
+                            (By.XPATH, f'/html/body/div[2]/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
+                except:
+                    WebDriverWait(driver, 0.5).until(
+                        EC.element_to_be_clickable(
+                            (By.XPATH, f'/html/body/div/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
 
             img = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.CLASS_NAME, "module-container")))
             # Wait for table or figures
-            m = re.search(r'(\(Figure.*?|\(Table.*?)', driver.page_source, flags=re.IGNORECASE)
+            m = re.search(r'(\(Figure.*?|\(Table.*?|<img)', driver.page_source, flags=re.IGNORECASE)
             if bool(m):
                 time.sleep(delay * 10)
                 print("Waiting for Table / Figure")
