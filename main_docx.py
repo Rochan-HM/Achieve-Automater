@@ -88,20 +88,6 @@ def main(doc_name, num_q):
             if closed_bar and "menu-selected" in closed_bar:
                 WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.XPATH, '//*[@id="side-nav"]/ul/li/button'))).click()
-            try:
-                WebDriverWait(driver, 0.5).until(
-                    EC.element_to_be_clickable(
-                        (By.XPATH, f"/html/body/div/main/section/div[1]/div/button[2]"))).click()
-
-            except:
-                try:
-                    WebDriverWait(driver, 0.5).until(
-                        EC.element_to_be_clickable(
-                            (By.XPATH, f'/html/body/div[2]/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
-                except:
-                    WebDriverWait(driver, 0.5).until(
-                        EC.element_to_be_clickable(
-                            (By.XPATH, f'/html/body/div/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
 
             img = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.CLASS_NAME, "module-container")))
@@ -163,6 +149,22 @@ def main(doc_name, num_q):
                     im = im.resize([int(0.5 * s) for s in im.size])
                     im.save(f"pages/page-{i}-wrong-{2}.png")
                     document.add_picture(f"pages/page-{i}-wrong-{2}.png")
+
+            # Next Question
+            try:
+                WebDriverWait(driver, 0.5).until(
+                    EC.element_to_be_clickable(
+                        (By.XPATH, f"/html/body/div/main/section/div[1]/div/button[2]"))).click()
+
+            except:
+                try:
+                    WebDriverWait(driver, 0.5).until(
+                        EC.element_to_be_clickable(
+                            (By.XPATH, f'/html/body/div[2]/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
+                except:
+                    WebDriverWait(driver, 0.5).until(
+                        EC.element_to_be_clickable(
+                            (By.XPATH, f'/html/body/div/main/nav/ul/li[2]/span/ul/li[{i}]/div/button'))).click()
 
             driver.switch_to.default_content()
         except Exception as e:
